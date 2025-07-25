@@ -51,8 +51,7 @@ func (apiCfg *apiConfig) handlerGetFeeds(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	for _,feed := range feeds {
-		respondWithJson(w, 201, databaseFeedToFeed(feed))
-	}
+	
+	respondWithJson(w, 201, databaseFeedsToFeeds(feeds))
 	
 }
