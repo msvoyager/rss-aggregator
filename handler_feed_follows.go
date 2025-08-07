@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/msvoyager/rss-aggregator/internal/database"
 )
@@ -49,3 +50,27 @@ func (apiCfg *apiConfig) handlerGetFeedFollows(w http.ResponseWriter, r *http.Re
 
 	respondWithJson(w, 201, databaseFeedFollowsToFeedFollows(follows))
 }
+
+
+func (apiCfg *apiConfig) handlerDeleteFeedFollows(w http.ResponseWriter, r *http.Request, user database.User) {
+	feedFollowIDstr := chi.URLParam(r, "feedFollowID")
+	feedFollowID,err := uuid.Parse(feedFollowIDstr)
+	if err!= nil {
+		respondWithError(w, 400, fmt.Sprintf("couldnt parse feed follow id: %v", err))
+		return
+	}
+
+	err = apiCfg.DB.DeleteFeedFollow(r.Context(), database.DeleteFeedFollowParams{
+		ID: feedFollowID,
+		UserID: user.ID,
+	})
+	if err!= nil {
+		respondWithError(w, 400, fmt.Sprintf("couldnt delete feed follows: %v", err))
+		return
+	}
+
+	respondWithJson(w, 200, struct{}{})
+}
+
+
+
